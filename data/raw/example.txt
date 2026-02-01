@@ -1,0 +1,5 @@
+La loi de Beer-Lambert décrit la relation entre l'absorbance et la concentration d'une solution.
+
+Elle est utilisée pour mesurer la concentration de substances chimiques dans un liquide.
+
+Cette loi est fondamentale en chimie analytique et physique.
