@@ -1,5 +1,5 @@
 """
-Module Chunk.py
+Module chunk_model.py
 """
 
 class Chunk:
@@ -28,9 +28,10 @@ class Chunk:
         )
     def __repr__(self):
         return (
-            f"Chunk ID : {self.id} "
-            f"Chunk source : {self.source} "
+            f"Chunk ID : {self.id}\n"
+            f"Chunk source : {self.source}\n"
             f"Chunk ordre : {self.ordre}\n"
+            f"Chunk content : {self.content}\n\n"
         )
     
 

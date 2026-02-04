@@ -1,7 +1,7 @@
 """
 Module Chunks.py qui permet de generer les chunks a partir de texts nettoyés.
 """
-from chunk import Chunk
+from .chunk_model import Chunk
 from typing import List
 
 def build_chunks(chunk_texts: List[str],source: str)-> List[Chunk]:
