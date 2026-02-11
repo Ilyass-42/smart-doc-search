@@ -30,7 +30,7 @@ def build_chunks(chunk_texts: List[str],source: str)-> List[Chunk]:
 
 
 if __name__ =="__main__":
-    from read_txt import read_txt_file
+    from src.documents.read_txt import read_txt_file
     FILEPATH = "/home/ielassad/smart-doc-search/data/raw/example.txt"
     source ="example"
     chunk_texts = read_txt_file(FILEPATH)
