@@ -39,6 +39,30 @@ class Engine:
     def chunk_matrix(self):
         return self._chunk_matrix
     
+    def add(self,chunks: list[Chunk]):
+        self._list_chunks.extend(chunks)
+        new_vocab = build_vocabulary(chunks)
+
+        new_mots = [mot for mot in new_vocab if mot not in self._vocab]
+        
+        for mot in new_mots:
+            self._vocab.append(mot)
+            
+
+        indice_depart = len(self._word_to_index)
+        
+        self._word_to_index.update(
+            {mot:index+indice_depart for mot,index in enumerate(new_mots)})
+        
+        new_vectors = np.array([TF(self._word_to_index, c.content) for c in chunks])
+        self._chunk_matrix = np.vstack([self._chunk_matrix, new_vectors])
+
+
+
+
+
+        
+    
     def search(self,querry:str,k=3) -> list[tuple[float,Chunk]]:
         """
         fonction qui recherche grace a une querry dans le texte
