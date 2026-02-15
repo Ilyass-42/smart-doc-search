@@ -4,6 +4,9 @@ import nltk
 import numpy as np
 
 def build_vocabulary(chunks :list [Chunk]) -> list [str]:
+    """
+    Prends en entrée une liste de chunk et en sortie donne une liste de string qui compse le vocabulaire associé au document
+    """
     vocab = set()
 
     for chunk in chunks:
@@ -12,6 +15,9 @@ def build_vocabulary(chunks :list [Chunk]) -> list [str]:
     return sorted(list(vocab))
 
 def process_text(text:str)-> list[str]:
+    """
+    Prends une liste de chaine de caractére, mets en minuscule et enleve les mots répetitifs qui n'ont aucune valeurs (ex: le, la, de ....)
+    """
     mots = re.findall("[a-zA-Zàâéèêëïîôùûüÿç]+",text)
 
     mots = [mot.lower() for mot in mots]
@@ -21,20 +27,19 @@ def process_text(text:str)-> list[str]:
 
     return mots
 
-def TF(vocab:list[str], chunk : Chunk) -> list[int]:
-    mots_chunks = process_text(chunk.content)
-    vector = np.zeros(len(vocab))
+def TF(word_to_index:dict[str,int], chunk_content : str) -> list[int]:
+    """
+    Prends en entrée un dictionnaire (indice : mot du vocab) et une chunk et en sortie on a un vecteur associé de la chunk
+    """
+    mots_chunks = process_text(chunk_content)
+    vector = np.zeros(len(word_to_index))
 
-    freq = {}
     for mot in mots_chunks:
-        freq[mot] = freq.get(mot,0) +1
-
-    for i,mot in enumerate(vocab):
-        if mot in freq:
-            vector[i] = freq[mot]
+        if mot in word_to_index:
+            vector[word_to_index[mot]]+=1
     return vector
 
-def cosine_similarity(vect1,vect2)->int:
+def cosine_similarity(vect1,vect2)->float:
     norm1  =np.linalg.norm(vect1)
     norm2  =np.linalg.norm(vect2)
     
@@ -45,16 +50,16 @@ def cosine_similarity(vect1,vect2)->int:
 
 
 
-if __name__=="__main__":
-    from src.documents.read_txt import read_txt_file
-    from src.documents.build_chunks import build_chunks
-    FILEPATH = "/home/ielassad/smart-doc-search/data/raw/example.txt"
-    source ="example"
-    chunk_texts = read_txt_file(FILEPATH)
-    chunk_list = build_chunks(chunk_texts,source)
-    vocab = build_vocabulary(chunk_list)
-    print(f"===== Vocabulaire====\n {vocab}")
-    print(f"=====TF===== \n{TF(vocab,chunk_list[0])}")
-    print(chunk_list[0].content)
+# if __name__=="__main__":
+#     from src.documents.read_txt import read_txt_file
+#     from src.documents.build_chunks import build_chunks
+#     FILEPATH = "/home/ielassad/smart-doc-search/data/raw/example.txt"
+#     source ="example"
+#     chunk_texts = read_txt_file(FILEPATH)
+#     chunk_list = build_chunks(chunk_texts,source)
+#     vocab = build_vocabulary(chunk_list)
+#     print(f"===== Vocabulaire====\n {vocab}")
+#     print(f"=====TF===== \n{TF(vocab,chunk_list[0])}")
+#     print(chunk_list[0].content)
 
 
