@@ -40,6 +40,15 @@ class Engine:
         return self._chunk_matrix
     
     def search(self,querry:str,k=3) -> list[tuple[float,Chunk]]:
+        """
+        fonction qui recherche grace a une querry dans le texte
+
+        k doit etre inférieur ou égale a nombre de chunk.
+        """
+        if querry.strip() == "":
+            raise ValueError("La requête ne peut pas être vide")
+
+        k = min(k,len(self._list_chunks))
         vector_querry = TF(self._word_to_index,querry)
         scores = []
         for i in range(len(self._list_chunks)):
@@ -67,7 +76,7 @@ if __name__=="__main__":
     def print_dict(dict):
         for key in dict.keys():
             print(f"Score : {key}\nChunk : [{dict[key]}]\n")
-    res = Engine.search("loi")
+    res = Engine.search("loi Beer",3)
     # print(f" ========== Word index ==========\n{Engine.chunk_matrix}")
     # print(f"======= Score,Chunks =======\n{print_dict(res)}")
     print(res)
