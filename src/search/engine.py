@@ -43,19 +43,29 @@ class Engine:
         self._list_chunks.extend(chunks)
         new_vocab = build_vocabulary(chunks)
 
+        taille_vocab_old = len(self._vocab)
+
         new_mots = [mot for mot in new_vocab if mot not in self._vocab]
         
         for mot in new_mots:
             self._vocab.append(mot)
+        
+        taille_vocab_new = len(self._vocab)
             
 
         indice_depart = len(self._word_to_index)
         
         self._word_to_index.update(
-            {mot:index+indice_depart for mot,index in enumerate(new_mots)})
+            {mot:index+indice_depart for index,mot in enumerate(new_mots)})
         
         new_vectors = np.array([TF(self._word_to_index, c.content) for c in chunks])
-        self._chunk_matrix = np.vstack([self._chunk_matrix, new_vectors])
+        
+        valeur_padding = taille_vocab_new-taille_vocab_old
+        if self._chunk_matrix.size == 0:
+            self._chunk_matrix = new_vectors
+        else:
+            self._chunk_matrix = np.pad(self._chunk_matrix,((0,0),(0,valeur_padding)),mode = 'constant',constant_values=0)
+            self._chunk_matrix = np.vstack([self._chunk_matrix, new_vectors])
 
 
 

@@ -2,6 +2,8 @@ from src.documents.chunk_model import Chunk
 import re 
 import nltk
 import numpy as np
+from nltk.stem.snowball import FrenchStemmer
+stemmer = FrenchStemmer()
 
 def build_vocabulary(chunks :list [Chunk]) -> list [str]:
     """
@@ -11,6 +13,7 @@ def build_vocabulary(chunks :list [Chunk]) -> list [str]:
 
     for chunk in chunks:
         mots_propre = process_text(chunk.content)
+        mots_propre = normalize(chunk.content)
         vocab.update(mots_propre)
     return sorted(list(vocab))
 
@@ -27,17 +30,26 @@ def process_text(text:str)-> list[str]:
 
     return mots
 
-def TF(word_to_index:dict[str,int], chunk_content : str) -> list[int]:
-    """
-    Prends en entrée un dictionnaire (indice : mot du vocab) et une chunk et en sortie on a un vecteur associé de la chunk
-    """
-    mots_chunks = process_text(chunk_content)
-    vector = np.zeros(len(word_to_index))
 
-    for mot in mots_chunks:
+def normalize(text: str):
+    text = text.lower()                       # tout en minuscules
+    text = re.sub(r'[^\w\s]', '', text)      # enlever la ponctuation
+    words = text.split()
+    words = [stemmer.stem(w) for w in words] # racines
+    return words
+
+def TF(word_to_index, content):
+    vector = np.zeros(len(word_to_index))
+    words = normalize(content)
+    for mot in words:
         if mot in word_to_index:
-            vector[word_to_index[mot]]+=1
+            vector[word_to_index[mot]] += 1
     return vector
+
+
+
+
+
 
 def cosine_similarity(vect1,vect2)->float:
     norm1  =np.linalg.norm(vect1)

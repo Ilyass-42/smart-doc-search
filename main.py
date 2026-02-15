@@ -7,7 +7,7 @@ FILEPATH = "/home/ielassad/smart-doc-search/data/raw/example.txt"
 source ="example"
 chunk_texts = read_txt_file(FILEPATH)
 chunk_list = build_chunks(chunk_texts,source)
-Engine = Engine(chunk_list) 
+Engine = Engine(chunk_list)
 
 
 while True:
@@ -21,4 +21,3 @@ while True:
     for score, chunks in res:
         print(f"Score : {score:.4f}\n")
         print(f"Chunks : {chunks}\n")
-
