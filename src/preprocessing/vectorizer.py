@@ -33,6 +33,7 @@ def process_text(text:str)-> list[str]:
 
 def normalize(text: str):
     text = text.lower()                       # tout en minuscules
+    text = text.replace("-"," ")  # rempalce les tirets par un espace
     text = re.sub(r'[^\w\s]', '', text)      # enlever la ponctuation
     words = text.split()
     words = [stemmer.stem(w) for w in words] # racines
@@ -44,7 +45,15 @@ def TF(word_to_index, content):
     for mot in words:
         if mot in word_to_index:
             vector[word_to_index[mot]] += 1
-    return vector
+    return np.where(vector>0,1+np.log(vector),0)
+
+def normalize_vector(vect):
+    norm = np.linalg.norm(vect)
+    
+    if norm == 0:
+        return vect
+    else:
+        return vect/norm
 
 
 

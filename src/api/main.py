@@ -45,7 +45,7 @@ def search (objet : SearchRequest):
     res = Engine.search(querry,k)
 
     return [
-        {"score":score, "content":chunk.content}
+        {"score":score, "Chunk":chunk}
         for score,chunk in res
         ]
 
