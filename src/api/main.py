@@ -4,10 +4,11 @@ from pydantic import BaseModel
 from src.search.engine import Engine
 from src.documents.read_txt import read_txt_file
 from src.documents.build_chunks import build_chunks
-
+from src.search.semantic_engine import SemanticEngine
 
 
 Engine = Engine(list_chunks=[]) 
+Semantic = SemanticEngine(list_chunks=[])
 
 
 app = FastAPI()
@@ -29,25 +30,46 @@ async def upload(file:UploadFile = File(...)):
     chunks_list = build_chunks(paragraphs,source=file.filename)
 
     Engine.add(chunks_list)
+    Semantic.add(list_chunks=chunks_list)
 
-    return {"message" :f"{len(chunks_list)} chunks ajoutés au moteur", "total_chunks":len(Engine.list_chunks) }
+    return {"message" :f"{len(chunks_list)} chunks ajoutés au moteur",
+            "total_chunks TF-IDF":len(Engine.list_chunks),
+            "total_chunks Semantic":{len(Semantic.list_chunks)} }
 
 
 class SearchRequest(BaseModel):
-    querry : str
+    query : str
     k : int 
 
 @app.post("/search")
 def search (objet : SearchRequest):
-    querry = objet.querry
+    query = objet.query
     k = objet.k
 
-    res = Engine.search(querry,k)
+    res = Engine.search(query,k)
 
     return [
         {"score":score, "Chunk":chunk}
         for score,chunk in res
         ]
+
+class SemanticSearchRequest(BaseModel):
+    query : str
+    k : int
+
+
+@app.post("/semantic_search")
+def semantic_search(request:SemanticSearchRequest):
+    query = request.query
+    k = request.k
+
+    res = Semantic.search(query,k)
+
+    return [
+        {"score":float(score), "Chunk":chunk.content}
+        for score,chunk in res
+        ]
+    
 
 
     
