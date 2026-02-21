@@ -4,6 +4,7 @@ from src.preprocessing.vectorizer import TF
 from src.preprocessing.vectorizer import cosine_similarity
 from src.preprocessing.vectorizer import normalize
 from src.preprocessing.vectorizer import normalize_vector
+import hashlib
 
 import numpy as np
 
@@ -11,6 +12,7 @@ import numpy as np
 class Engine:
     def __init__(self,list_chunks:list[Chunk]):
         self._list_chunks= list_chunks
+        self._files_hashes = set()
         self._vocab = build_vocabulary(self._list_chunks)
         self._idf_vector = np.array([])
         self._word_to_index={
@@ -42,39 +44,47 @@ class Engine:
         return self._chunk_matrix
     
     def add(self,chunks: list[Chunk]):
-        self._list_chunks.extend(chunks)
-        new_vocab = build_vocabulary(chunks)
+        new_chunks = []
 
-        taille_vocab_old = len(self._vocab)
+        for c in chunks:
+            content_hash = hashlib.sha256(c.content.encode()).hexdigest()
 
-        new_mots = [mot for mot in new_vocab if mot not in self._vocab]
-        
-        for mot in new_mots:
-            self._vocab.append(mot)
-        
-        taille_vocab_new = len(self._vocab)
+            if (c.source,content_hash) not in self._files_hashes:
+                self._files_hashes.add((c.source,content_hash))
+                new_chunks.append(c)
             
 
-        indice_depart = len(self._word_to_index)
-        
-        self._word_to_index.update(
-            {mot:index+indice_depart for index,mot in enumerate(new_mots)})
-        
-        new_vectors = np.array([TF(self._word_to_index, c.content) for c in chunks])
-        
-        valeur_padding = taille_vocab_new-taille_vocab_old
-        print(f"AVANT {self._chunk_matrix.shape}")
-        print(f"Taille d'un seul vectors {new_vectors.shape}")
-        if self._chunk_matrix.size == 0:
-            self._chunk_matrix = new_vectors*self._compute_idf()
+        if new_chunks:
+            self._list_chunks.extend(new_chunks)
+            new_vocab = build_vocabulary(new_chunks)
 
-            print(f"APRES {self._chunk_matrix.shape}")
-        else:
-            self._chunk_matrix = np.pad(self._chunk_matrix,((0,0),(0,valeur_padding)),mode = 'constant',constant_values=0)
-            self._chunk_matrix = np.vstack([self._chunk_matrix, new_vectors])
+            taille_vocab_old = len(self._vocab)
+
+            new_mots = [mot for mot in new_vocab if mot not in self._vocab]
             
-        idf_vector = self._compute_idf()
-        self._chunk_matrix = self._chunk_matrix*idf_vector
+            for mot in new_mots:
+                self._vocab.append(mot)
+            
+            taille_vocab_new = len(self._vocab)
+                
+
+            indice_depart = len(self._word_to_index)
+            
+            self._word_to_index.update(
+                {mot:index+indice_depart for index,mot in enumerate(new_mots)})
+            
+            new_vectors = np.array([TF(self._word_to_index, c.content) for c in new_chunks])
+            
+            valeur_padding = taille_vocab_new-taille_vocab_old
+            if self._chunk_matrix.size == 0:
+                self._chunk_matrix = new_vectors*self._compute_idf()
+
+            else:
+                self._chunk_matrix = np.pad(self._chunk_matrix,((0,0),(0,valeur_padding)),mode = 'constant',constant_values=0)
+                self._chunk_matrix = np.vstack([self._chunk_matrix, new_vectors])
+                
+            idf_vector = self._compute_idf()
+            self._chunk_matrix = self._chunk_matrix*idf_vector
 
 
 

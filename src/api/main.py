@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 
 from src.search.engine import Engine
-from src.documents.read_txt import read_txt_file
+from src.documents.read_pdf import read_pdf
 from src.documents.build_chunks import build_chunks
 from src.search.semantic_engine import SemanticEngine
 
@@ -19,22 +19,25 @@ def read_root():
 
 @app.post("/upload")
 async def upload(file:UploadFile = File(...)):
-    if not file.filename.endswith(".txt"):
-        return {"error" : "Seuls les fichiers txt sont accéptés pour le moment"}
+    if  file.filename.endswith(".txt"):
+        content = await file.read()
+        text = content.decode("utf-8")
+
+        paragraphs = [p for p in text.split("\n\n") if p.strip() != ""]
+    elif file.filename.endswith(".pdf"):
+        paragraphs = read_pdf(file)
     
-    content = await file.read()
-    text = content.decode("utf-8")
-
-    paragraphs = [p for p in text.split("\n\n") if p.strip() != ""]
-
     chunks_list = build_chunks(paragraphs,source=file.filename)
-
     Engine.add(chunks_list)
     Semantic.add(list_chunks=chunks_list)
 
     return {"message" :f"{len(chunks_list)} chunks ajoutés au moteur",
-            "total_chunks TF-IDF":len(Engine.list_chunks),
-            "total_chunks Semantic":{len(Semantic.list_chunks)} }
+            "message2":f"Nombre total de chunks dans le moteur Engine: {len(Engine.list_chunks)}",
+            "message3":f"Nombre total de chunks dans le moteur Semantic : {len(Semantic.list_chunks)}"
+            }
+
+            # "total_chunks TF-IDF":f"{len(Engine.list_chunks)} chunks ajoutés au moteur TF-IDF",
+            # "total_chunks Semantic":f"{len(Semantic.list_chunks)}"} 
 
 
 class SearchRequest(BaseModel):
@@ -49,7 +52,7 @@ def search (objet : SearchRequest):
     res = Engine.search(query,k)
 
     return [
-        {"score":score, "Chunk":chunk}
+        {"score":score, "chunk":chunk.content}
         for score,chunk in res
         ]
 
@@ -66,7 +69,7 @@ def semantic_search(request:SemanticSearchRequest):
     res = Semantic.search(query,k)
 
     return [
-        {"score":float(score), "Chunk":chunk.content}
+        {"score":float(score), "chunk":chunk.content}
         for score,chunk in res
         ]
     

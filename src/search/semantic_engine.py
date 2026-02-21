@@ -2,6 +2,7 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from src.documents.chunk_model import Chunk
 from src.preprocessing.vectorizer import cosine_similarity
+import hashlib
 
 class SemanticEngine:
     def __init__(self,list_chunks: list[Chunk]):
@@ -10,6 +11,7 @@ class SemanticEngine:
 
         self._list_chunks = list_chunks
         self._embeddings = None
+        self._files_hashes = set()
 
         if list_chunks:
             self._embeddings = self._model.encode(
@@ -18,16 +20,26 @@ class SemanticEngine:
             )
 
     def add(self,list_chunks : list[Chunk]):
-        self._list_chunks.extend(list_chunks)
-    
-        new_embeddings = self._model.encode(
-            [c.content for c in list_chunks],
-            normalize_embeddings=True
-        )
-        if self._embeddings is None:
-            self._embeddings = new_embeddings
-        else:
-            self._embeddings = np.vstack([self._embeddings,new_embeddings])
+        new_chunks = []
+
+        for c in list_chunks:
+            content_hash = hashlib.sha256(c.content.encode()).hexdigest()
+
+            if (c.source,content_hash) not in self._files_hashes:
+                self._files_hashes.add((c.source,content_hash))
+                new_chunks.append(c)
+        
+        if new_chunks:
+            self._list_chunks.extend(new_chunks)
+        
+            new_embeddings = self._model.encode(
+                [c.content for c in new_chunks],
+                normalize_embeddings=True
+            )
+            if self._embeddings is None:
+                self._embeddings = new_embeddings
+            else:
+                self._embeddings = np.vstack([self._embeddings,new_embeddings])
 
     def search(self,query:str,k=3):
 

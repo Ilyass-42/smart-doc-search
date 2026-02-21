@@ -18,7 +18,6 @@ def search_chunks(chunks:list[Chunk], query :str, *querys) -> list[Chunk]:
                     res.append(chunk)
     return res
 
-# idée pour chercher les phrases, on les decoupes en mots.
 
 if __name__ == "__main__":
     from src.documents.build_chunks import build_chunks
