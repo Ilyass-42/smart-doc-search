@@ -18,8 +18,9 @@ Smart Doc Search est un moteur de recherche intelligent pour documents texte et 
 
 ## Problèmes résolus et à venir
 - Duplication de chunks **résolue**  
-- **Optimisation** en cours pour accélérer les recherches volumineuses  
-- Support PDF complet et amélioration UI à venir  
+- **Optimisation** à venir pour accélérer les recherches volumineuses  
+- Support PDF complet **résolue** 
+- Amélioration UI à venir  
 
 ## Installation & usage
 
