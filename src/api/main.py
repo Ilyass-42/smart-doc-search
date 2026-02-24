@@ -1,15 +1,15 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 
-from src.search.engine import Engine
+from src.services.retrieval_services import RetrievalService
+from src.services.rag_services import RAGService
 from src.documents.read_pdf import read_pdf
 from src.documents.build_chunks import build_chunks
-from src.search.semantic_engine import SemanticEngine
 
 
-Engine = Engine(list_chunks=[]) 
-Semantic = SemanticEngine(list_chunks=[])
 
+retrieval_service = RetrievalService()
+rag_service = RAGService(retrieval_service)
 
 app = FastAPI()
 
@@ -28,16 +28,9 @@ async def upload(file:UploadFile = File(...)):
         paragraphs = read_pdf(file)
     
     chunks_list = build_chunks(paragraphs,source=file.filename)
-    Engine.add(chunks_list)
-    Semantic.add(list_chunks=chunks_list)
+    retrieval_service.add_chunks(chunks_list)
 
-    return {"message" :f"{len(chunks_list)} chunks ajoutés au moteur",
-            "message2":f"Nombre total de chunks dans le moteur Engine: {len(Engine.list_chunks)}",
-            "message3":f"Nombre total de chunks dans le moteur Semantic : {len(Semantic.list_chunks)}"
-            }
-
-            # "total_chunks TF-IDF":f"{len(Engine.list_chunks)} chunks ajoutés au moteur TF-IDF",
-            # "total_chunks Semantic":f"{len(Semantic.list_chunks)}"} 
+    return {"message" :f"{len(chunks_list)} chunks ajoutés au moteur"}
 
 
 class SearchRequest(BaseModel):
@@ -46,10 +39,8 @@ class SearchRequest(BaseModel):
 
 @app.post("/search")
 def search (objet : SearchRequest):
-    query = objet.query
-    k = objet.k
 
-    res = Engine.search(query,k)
+    res = retrieval_service.search_tfidf(objet.query,objet.k)
 
     return [
         {"score":score, "chunk":chunk.content}
@@ -63,15 +54,17 @@ class SemanticSearchRequest(BaseModel):
 
 @app.post("/semantic_search")
 def semantic_search(request:SemanticSearchRequest):
-    query = request.query
-    k = request.k
-
-    res = Semantic.search(query,k)
+    
+    res = retrieval_service.search_semantic(request.query,request.k)
 
     return [
         {"score":float(score), "chunk":chunk.content}
         for score,chunk in res
         ]
+
+@app.post("/ask")
+def ask_question(request:SearchRequest):
+    return rag_service.ask(request.query)
     
 
 
