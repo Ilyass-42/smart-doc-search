@@ -83,8 +83,8 @@ class Engine:
                 self._chunk_matrix = np.pad(self._chunk_matrix,((0,0),(0,valeur_padding)),mode = 'constant',constant_values=0)
                 self._chunk_matrix = np.vstack([self._chunk_matrix, new_vectors])
                 
-            idf_vector = self._compute_idf()
-            self._chunk_matrix = self._chunk_matrix*idf_vector
+            self._idf_vector = self._compute_idf()
+            self._chunk_matrix = self._chunk_matrix*self._idf_vector
 
 
 
@@ -94,13 +94,14 @@ class Engine:
             raise ValueError("Aucun chunk dans l'engine")
         self._idf_vector = []
         N = len(self._list_chunks)
+
+        tokenized = [set(normalize(c.content))for c in self._list_chunks]
+
         for mot in self._vocab:
-            df = 0
-            for c in self._list_chunks:
-                if mot in normalize(c.content):
-                    df +=1
+            df = sum(1 for tokens in tokenized if mot in tokens)
             df = max(df,1)
             self._idf_vector.append(np.log(N/df))
+
         self._idf_vector = np.array(self._idf_vector)
         return self._idf_vector
 
@@ -118,18 +119,19 @@ class Engine:
         if  self._idf_vector.size<=0:
             raise ValueError("Len = 0")
         k = min(k,len(self._list_chunks))
-        vector_querry = normalize_vector(TF(self._word_to_index,querry)*self._compute_idf())
-        scores = []
+        
+        vector_querry = normalize_vector(TF(self._word_to_index,querry)*self._idf_vector)
         if len(self._list_chunks) == 0:
             raise ValueError("Il y a pas de chunk")
-        for i in range(len(self._list_chunks)):
-            vect1 = normalize_vector(self._chunk_matrix[i,:])
-            scores.append((cosine_similarity(vect1,vector_querry),self._list_chunks[i]))
 
-        scores.sort(key=lambda x:x[0],reverse=True)
+        norms = np.linalg.norm(self.chunk_matrix,axis=1,keepdims=True)
+        norms[norms == 0] = 1        
+        normalized_matarix = self._chunk_matrix / norms
 
-        return scores[:k]
+        scores = normalized_matarix @ vector_querry
+        top_k = np.argsort(scores)[::-1][:k]
 
+        return [(scores[i], self._list_chunks[i]) for i in top_k]
 
 
 

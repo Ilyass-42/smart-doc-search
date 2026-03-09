@@ -3,6 +3,7 @@ import numpy as np
 from src.documents.chunk_model import Chunk
 from src.preprocessing.vectorizer import cosine_similarity
 import hashlib
+import torch
 
 class SemanticEngine:
     def __init__(self,list_chunks: list[Chunk]):
