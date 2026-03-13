@@ -26,6 +26,10 @@ class Engine:
 
         for i in range(Nb_chunks):
             self._chunk_matrix[i,:] = TF(self._word_to_index,list_chunks[i].content)
+        if list_chunks:
+            self._idf_vector = self._compute_idf()
+            self._chunk_matrix = self._chunk_matrix*self._idf_vector
+
 
     @property
     def list_chunks(self):
@@ -77,7 +81,7 @@ class Engine:
             
             valeur_padding = taille_vocab_new-taille_vocab_old
             if self._chunk_matrix.size == 0:
-                self._chunk_matrix = new_vectors*self._compute_idf()
+                self._chunk_matrix = new_vectors
 
             else:
                 self._chunk_matrix = np.pad(self._chunk_matrix,((0,0),(0,valeur_padding)),mode = 'constant',constant_values=0)
@@ -126,9 +130,9 @@ class Engine:
 
         norms = np.linalg.norm(self.chunk_matrix,axis=1,keepdims=True)
         norms[norms == 0] = 1        
-        normalized_matarix = self._chunk_matrix / norms
+        normalized_matrix = self._chunk_matrix / norms
 
-        scores = normalized_matarix @ vector_querry
+        scores = normalized_matrix @ vector_querry
         top_k = np.argsort(scores)[::-1][:k]
 
         return [(scores[i], self._list_chunks[i]) for i in top_k]

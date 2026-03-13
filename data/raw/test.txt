@@ -1,0 +1,17 @@
+La loi de Beer-Lambert établit une relation linéaire entre l’absorbance et la concentration d’une solution. 
+Cette loi est largement utilisée en spectrophotométrie.
+
+En chimie analytique, l’absorbance permet de déterminer la concentration d’un soluté dans un liquide.
+Plus la concentration augmente, plus l’absorbance augmente également.
+
+La loi de Newton décrit la relation entre la force, la masse et l’accélération d’un corps.
+Elle est fondamentale en mécanique classique.
+
+En physique optique, la spectroscopie est utilisée pour analyser la lumière absorbée par une substance.
+Certaines méthodes reposent sur le principe de Beer Lambert.
+
+La concentration molaire est une grandeur importante en chimie.
+Elle s’exprime en moles par litre.
+
+La photosynthèse est un processus biologique qui permet aux plantes de convertir la lumière en énergie chimique.
+Elle n’a aucun lien direct avec la loi de Beer-Lambert.
