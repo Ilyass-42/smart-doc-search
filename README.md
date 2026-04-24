@@ -87,10 +87,13 @@ cd smart-doc-search
 pip install -r requirements.txt
 ```
 
-### 3. Add your Gemini API key
+### 3. Add your API key
 
 Create a `.env` file at the root:
-GEMINI_API_KEY=your_key_here
+
+```
+KEY=your_key_here
+```
 ### 4. Start the FastAPI backend
 
 ```bash
