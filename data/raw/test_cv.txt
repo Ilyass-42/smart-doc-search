@@ -1,0 +1,3 @@
+Marie Dupont is a software engineer with 5 years of experience in Python and machine learning.
+She worked at Google as a data scientist and built NLP pipelines for search ranking.
+She also has experience in FastAPI, Docker, and cloud deployment on AWS.
