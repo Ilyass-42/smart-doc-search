@@ -32,6 +32,7 @@ A document search engine that lets you upload TXT and PDF files and query them u
 ---
 
 ## 🗂️ Project Structure
+```
 smart-doc-search/
 ├── app.py                  # Streamlit frontend
 ├── main.py                 # FastAPI entry point
@@ -56,6 +57,7 @@ smart-doc-search/
 │       ├── rag_services.py      # Gemini RAG integration
 │       └── retrieval_services.py
 └── tests/
+```
 ---
 
 ## 🛠️ Tech Stack
@@ -121,5 +123,5 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ## 👤 Author
 
-**Ilyass** — Computer Engineering Student, INSA Rouen (ML/AI track)  
+**Ilyass** — 3rd-year Computer Engineering Student, INSA Rouen (ML/AI track)
 [GitHub](https://github.com/Ilyass-42) · [LinkedIn](https://www.linkedin.com/in/ilyass-el-assad-965598321/)
