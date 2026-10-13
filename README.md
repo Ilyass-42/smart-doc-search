@@ -77,7 +77,7 @@ smart-doc-search/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/smart-doc-search.git
+git clone https://github.com/Ilyass-42/smart-doc-search.git
 cd smart-doc-search
 ```
 
@@ -127,4 +127,4 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 ## 👤 Author
 
 **Ilyass** — 3rd-year Computer Engineering Student
-[GitHub](https://github.com/Ilyass-42) · 
+[GitHub](https://github.com/Ilyass-42) 
